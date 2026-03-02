@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2025-02-16 22:38:51
- * @LastEditTime: 2025-02-17 21:57:31
+ * @LastEditTime: 2026-03-02 23:09:36
  * @LastEditors: FunctionSir
  * @Description: -
  * @FilePath: /wol-http/main.go
@@ -10,6 +10,7 @@
 package main
 
 import (
+	"crypto/subtle"
 	"fmt"
 	"net/http"
 	"os"
@@ -44,7 +45,7 @@ type FastFetch struct {
 }
 
 const (
-	VER             string = "0.1.0"
+	VER             string = "0.1.1"
 	CODENAME        string = "SatenRuiko"
 	DEFAULT_WOL_BIN string = "/usr/bin/wakeonlan"
 )
@@ -83,9 +84,9 @@ func hello() {
 
 func httpHandler(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	if token != Conf.Token {
+	if subtle.ConstantTimeCompare([]byte(token), []byte(Conf.Token)) != 1 {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("403 wrong token provided"))
+		_, _ = w.Write([]byte("403 wrong token provided"))
 		return
 	}
 
@@ -102,13 +103,13 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 		target = FF.ByMacAddr[key]
 	default:
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("400 bad request"))
+		_, _ = w.Write([]byte("400 bad request"))
 		return
 	}
 
 	if target == nil {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("404 entry not found"))
+		_, _ = w.Write([]byte("404 entry not found"))
 		return
 	}
 
@@ -120,19 +121,19 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 		infoStr := fmt.Sprintf("Name: %s\nAlias: %s\nIP: %s\nMAC: %s\nNote: %s\n",
 			target.Name, target.Alias, target.IpAddr, target.MacAddr, target.Note)
 
-		w.Write([]byte(infoStr))
+		_, _ = w.Write([]byte(infoStr))
 	case "wake":
 		cmd := exec.Command(Conf.WolBin, target.MacAddr)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(slices.Concat([]byte("500 internal server error\n"), output))
+			_, _ = w.Write(slices.Concat([]byte("500 internal server error\n"), output))
 			return
 		}
-		w.Write(output)
+		_, _ = w.Write(output)
 	default:
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("400 bad request"))
+		_, _ = w.Write([]byte("400 bad request"))
 		return
 	}
 }

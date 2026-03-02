@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2025-02-16 22:23:16
- * @LastEditTime: 2025-02-17 22:11:34
+ * @LastEditTime: 2026-03-02 23:23:17
  * @LastEditors: FunctionSir
  * @Description: README.md
  * @FilePath: /wol-http/README.md
@@ -10,7 +10,13 @@
 # wol-http
 
 Wake on LAN plus HTTP.  
-Current version: 0.1.0 (SatenRuiko).  
+Current version: 0.1.1 (SatenRuiko).  
+
+## What changed
+
+**SECURITY:** Use constant time compare in token versification.  
+
+We **recommend** you update to this new version to prevent side-channel attacks.  
 
 ## How to config
 
@@ -31,3 +37,10 @@ You can specify the target by name/alias/IP/MAC.
 Use action "info" to get the information you set.  
 Use action "wake" to try to wake it up on LAN.  
 If succeed, the response will have a status code 200 and a body of the command output (stdout and stderr combined output).  
+
+You can use aliases to help you:
+
+``` bash
+alias rwol='curl https://example.org:2420/some-token/wake/alias/$1'
+rwol sa
+```
