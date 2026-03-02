@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2025-02-16 22:23:16
- * @LastEditTime: 2026-03-02 23:24:39
+ * @LastEditTime: 2026-03-03 00:00:40
  * @LastEditors: FunctionSir
  * @Description: README.md
  * @FilePath: /wol-http/README.md
@@ -41,6 +41,6 @@ If succeed, the response will have a status code 200 and a body of the command o
 You can use command "alias" to help you:
 
 ``` bash
-alias rwol='curl https://example.org:2420/some-token/wake/alias/$1'
+alias rwol='bash -c \'curl https://example.org:2420/some-token/wake/alias/$0\''
 rwol sa
 ```
